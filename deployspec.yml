@@ -1,0 +1,49 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - set -e  # Exit script on error
+      - yum update -y
+      - yum install -y git python3 python3-pip jq dnf
+      - pip install awscli
+      - curl -o aws-iam-authenticator https://s3.us-west-2.amazonaws.com/amazon-eks/1.21.2/2021-07-05/bin/linux/amd64/aws-iam-authenticator
+      - chmod +x aws-iam-authenticator && mv aws-iam-authenticator /usr/local/bin/
+      - curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kubectl
+      - chmod +x kubectl && mv kubectl /usr/local/bin/
+      - curl -sSL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+      - helm version
+      - kubectl version --client
+
+  pre_build:
+    commands:
+      - echo "Updating kubeconfig..."
+      - aws eks --region $CLUSTER_REGION update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_CODEBUILD_ROLE_ARN
+      - export KUBECONFIG=/root/.kube/config
+      - chmod 0600 ~/.kube/config
+      - echo "Checking AWS credentials..."
+      - aws sts get-caller-identity
+      - echo "Checking Kubernetes contexts..."
+      - kubectl config get-contexts
+      - echo "Verifying EKS authentication..."
+      - export KUBERNETES_EXEC_INFO=$(aws eks get-token --cluster-name $EKS_CLUSTER_NAME)
+      - echo "Authentication successful!"
+      - echo "Checking Kubernetes access..."
+      - kubectl auth can-i '*' '*'
+
+  build:
+    commands:
+      - echo "Cloning the kubernetes-is repo..."
+      - git clone https://github.com/loshan20011/kubernetes-is.git
+      - echo "Deploying Helm Chart..."
+      - helm upgrade --install wso2-identity-server -n wso2is ./kubernetes-is --set deployment.ingress.hostName=d1p2tkkl5y00lx.cloudfront.net --set deployment.ingress.aws.enabled=true --set deployment.ingress.rbac.annotations.eks.amazonaws.com/role-arn=arn:aws:iam::302263080987:role/pic-poc-irsa-dev-useast2-iam-role --set deployment.externalJKS.enabled=true --set deployment.persistence.aws.enabled=true --set pv-pvc.deployment.persistence.aws.volumeHandle=fs-047d9586e40a8413c --set deployment.secretStore.aws.enabled=true --set deployment.secretStore.aws.secretManager.region=us-east-2 --set deployment.image.registry=302263080987.dkr.ecr.us-east-1.amazonaws.com --set deployment.image.repository=wso2is-postgresql --set deployment.image.tag=latestpipe --set deploymentToml.database.identity.type=postgre --set deploymentToml.database.shared.type=postgre --set deploymentToml.database.user.type=postgre --set deploymentToml.database.consent.type=postgre --set deploymentToml.database.identity.url=jdbc:postgresql://pic-poc-postgresql-dev-useast2-aurora-rds-cluster-db-instance-1.cro2k4cw4do1.us-east-2.rds.amazonaws.com:5432/identitydb --set deploymentToml.database.shared.url=jdbc:postgresql://pic-poc-postgresql-dev-useast2-aurora-rds-cluster-db-instance-1.cro2k4cw4do1.us-east-2.rds.amazonaws.com:5432/shareddb --set deploymentToml.database.user.url=jdbc:postgresql://pic-poc-postgresql-dev-useast2-aurora-rds-cluster-db-instance-1.cro2k4cw4do1.us-east-2.rds.amazonaws.com:5432/userdb --set deploymentToml.database.consent.url=jdbc:postgresql://pic-poc-postgresql-dev-useast2-aurora-rds-cluster-db-instance-1.cro2k4cw4do1.us-east-2.rds.amazonaws.com:5432/consentdb --set deploymentToml.database.identity.driver=org.postgresql.Driver --set deploymentToml.database.shared.driver=org.postgresql.Driver --set deploymentToml.database.user.driver=org.postgresql.Driver --set deploymentToml.database.consent.driver=org.postgresql.Driver --set deploymentToml.keystore.tls.fileName=tls.jks --set deploymentToml.keystore.primary.fileName=primary.jks --set deploymentToml.keystore.internal.fileName=internal.jks --set deployment.apparmor.enabled="false" --set deployment.rbac.annotations."eks\.amazonaws\.com/role-arn"="arn:aws:iam::302263080987:role/pic-poc-irsa-dev-useast2-iam-role"
+  post_build:
+    commands:
+      - echo "Verifying deployed resources..."
+      - kubectl get pods -A
+      - kubectl get services -A
+      - kubectl get pvc -n wso2is
+
+artifacts:
+  files:
+    - '**/*'  # This includes all files and directories in the build's workspace
