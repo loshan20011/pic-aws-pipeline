@@ -36,33 +36,33 @@ phases:
       - echo "Cloning the kubernetes-is repo..."
       - git clone https://github.com/loshan20011/kubernetes-is.git
       - echo "Deploying Helm Chart..."
-      - helm upgrade --install wso2-identity-server ./kubernetes-is -n wso2is \
-        --set deployment.ingress.hostName=$CLOUD_FRONT_HOST \
-        --set deployment.ingress.aws.enabled=true \
-        --set deployment.externalJKS.enabled=true \
-        --set deployment.persistence.aws.enabled=true \
-        --set pv-pvc.deployment.persistence.aws.volumeHandle=$VOLUME_HANDLE \
-        --set deployment.secretStore.aws.enabled=true \
-        --set deployment.secretStore.aws.secretManager.region=$CLUSTER_REGION \
-        --set deployment.image.registry=$ECR_REGISTRY \
-        --set deployment.image.repository=$ECR_IMAGE \
-        --set deployment.image.tag=$ECR_TAG \
-        --set deploymentToml.database.identity.type=postgre \
-        --set deploymentToml.database.shared.type=postgre \
-        --set deploymentToml.database.user.type=postgre \
-        --set deploymentToml.database.consent.type=postgre \
-        --set deploymentToml.database.identity.url=jdbc:postgresql://$RDS_HOST:5432/identitydb \
-        --set deploymentToml.database.shared.url=jdbc:postgresql://$RDS_HOST:5432/shareddb \
-        --set deploymentToml.database.user.url=jdbc:postgresql://$RDS_HOST:5432/userdb \
-        --set deploymentToml.database.consent.url=jdbc:postgresql://$RDS_HOST:5432/consentdb \
-        --set deploymentToml.database.identity.driver=org.postgresql.Driver \
-        --set deploymentToml.database.shared.driver=org.postgresql.Driver \
-        --set deploymentToml.database.user.driver=org.postgresql.Driver \
-        --set deploymentToml.database.consent.driver=org.postgresql.Driver \
-        --set deploymentToml.keystore.tls.fileName=tls.jks \
-        --set deploymentToml.keystore.primary.fileName=primary.jks \
-        --set deploymentToml.keystore.internal.fileName=internal.jks \
-        --set deployment.apparmor.enabled="false" \
+      - helm upgrade --install wso2-identity-server ./kubernetes-is -n wso2is
+        --set deployment.ingress.hostName=$CLOUD_FRONT_HOST
+        --set deployment.ingress.aws.enabled=true
+        --set deployment.externalJKS.enabled=true
+        --set deployment.persistence.aws.enabled=true
+        --set pv-pvc.deployment.persistence.aws.volumeHandle=$VOLUME_HANDLE 
+        --set deployment.secretStore.aws.enabled=true 
+        --set deployment.secretStore.aws.secretManager.region=$CLUSTER_REGION 
+        --set deployment.image.registry=$ECR_REGISTRY 
+        --set deployment.image.repository=$ECR_IMAGE 
+        --set deployment.image.tag=$ECR_TAG 
+        --set deploymentToml.database.identity.type=postgre 
+        --set deploymentToml.database.shared.type=postgre 
+        --set deploymentToml.database.user.type=postgre 
+        --set deploymentToml.database.consent.type=postgre 
+        --set deploymentToml.database.identity.url=jdbc:postgresql://$RDS_HOST:5432/identitydb 
+        --set deploymentToml.database.shared.url=jdbc:postgresql://$RDS_HOST:5432/shareddb 
+        --set deploymentToml.database.user.url=jdbc:postgresql://$RDS_HOST:5432/userdb 
+        --set deploymentToml.database.consent.url=jdbc:postgresql://$RDS_HOST:5432/consentdb 
+        --set deploymentToml.database.identity.driver=org.postgresql.Driver 
+        --set deploymentToml.database.shared.driver=org.postgresql.Driver 
+        --set deploymentToml.database.user.driver=org.postgresql.Driver 
+        --set deploymentToml.database.consent.driver=org.postgresql.Driver 
+        --set deploymentToml.keystore.tls.fileName=tls.jks 
+        --set deploymentToml.keystore.primary.fileName=primary.jks 
+        --set deploymentToml.keystore.internal.fileName=internal.jks 
+        --set deployment.apparmor.enabled="false" 
         --set deployment.rbac.annotations."eks.amazonaws.com/role-arn"=$IRSA_ROLE_ARN
 
   post_build:
