@@ -63,7 +63,7 @@ phases:
         --set deploymentToml.keystore.primary.fileName=primary.jks 
         --set deploymentToml.keystore.internal.fileName=internal.jks 
         --set deployment.apparmor.enabled="false" 
-        --set deployment.rbac.annotations."eks.amazonaws.com/role-arn"=$IRSA_ROLE_ARN --debug --dry-run
+        --set deployment.rbac.annotations."eks\.amazonaws\.com/role-arn"="arn:aws:iam::302263080987:role/pic-poc-irsa-dev-useast2-iam-role" --debug --dry-run
 
   post_build:
     commands:
