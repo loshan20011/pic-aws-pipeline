@@ -36,7 +36,7 @@ phases:
       - echo "Cloning the kubernetes-is repo..."
       - git clone https://github.com/loshan20011/kubernetes-is.git
       - echo "Deploying Helm Chart..."
-      - helm upgrade --install wso2-identity-server ./kubernetes-is -n wso2is
+      - helm upgrade --install --wait wso2-identity-server ./kubernetes-is -n wso2is
         --set deployment.ingress.hostName=$CLOUD_FRONT_HOST
         --set deployment.ingress.aws.enabled=true
         --set deployment.externalJKS.enabled=true
