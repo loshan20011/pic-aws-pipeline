@@ -64,7 +64,7 @@ phases:
         --set deploymentToml.keystore.internal.fileName=internal.jks 
         --set deployment.apparmor.enabled="false" 
         --set deployment.rbac.annotations."eks\.amazonaws\.com/role-arn"=$IRSA_ROLE_ARN
-        --set fullnameOverride=$RELEASE_NAME
+        --set fullnameOverride="wso2-identity-server"
 
   post_build:
     commands:
