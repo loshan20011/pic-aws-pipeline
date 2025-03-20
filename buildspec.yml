@@ -96,7 +96,7 @@ phases:
       - yq eval '.deployment.ingress.hostName = strenv(CLOUD_FRONT_HOST)' -i $VALUES_FILE
       - yq eval '.deployment.ingress.aws.enabled = true' -i $VALUES_FILE
       - yq eval '.deployment.externalJKS.enabled = true' -i $VALUES_FILE
-      - yq eval '.deployment.persistence.aws.enabled = true -i $VALUES_FILE'
+      - yq eval '.deployment.persistence.aws.enabled = true' -i $VALUES_FILE
       - yq eval '.pv-pvc.deployment.persistence.aws.volumeHandle = strenv(VOLUME_HANDLE)' -i $VALUES_FILE
       - yq eval '.deployment.secretStore.aws.enabled = true' -i $VALUES_FILE
       - yq eval '.deployment.secretStore.aws.secretManager.region = strenv(CLUSTER_REGION)' -i $VALUES_FILE
