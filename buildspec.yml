@@ -14,6 +14,8 @@ phases:
       - curl -sSL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
       - helm version
       - kubectl version --client
+      - wget https://github.com/mikefarah/yq/releases/download/v4.13.0/yq_linux_amd64 -O /usr/local/bin/yq
+      - chmod +x /usr/local/bin/yq
 
   pre_build:
     commands:
@@ -91,6 +93,31 @@ phases:
       - kubectl get services -A
       - echo "Cloning the kubernetes-is repo..."
       - git clone --branch AWS-Helm https://github.com/loshan20011/kubernetes-is.git
+      - yq eval '.deployment.ingress.hostName = strenv(CLOUD_FRONT_HOST)' -i $VALUES_FILE
+      - yq eval '.deployment.aws.enabled = true' -i $VALUES_FILE
+      - yq eval '.deployment.externalJKS.enabled = true' -i $VALUES_FILE
+      - yq eval '.deployment.persistence.aws.volumeHandle = strenv(VOLUME_HANDLE)' -i $VALUES_FILE
+      - yq eval '.deployment.secretStore.aws.enabled = true' -i $VALUES_FILE
+      - yq eval '.deployment.secretStore.aws.secretManager.region = strenv(CLUSTER_REGION)' -i $VALUES_FILE
+      - yq eval '.deployment.image.registry = strenv(ECR_REGISTRY)' -i $VALUES_FILE
+      - yq eval '.deployment.image.repository = strenv(ECR_IMAGE)' -i $VALUES_FILE
+      - yq eval '.deployment.image.tag = strenv(ECR_TAG)' -i $VALUES_FILE
+      - yq eval '.deployment.toml.database.identity.url = "jdbc:postgresql://strenv(RDS_HOST):5432/identitydb"' -i $VALUES_FILE
+      - yq eval '.deployment.toml.database.shared.url = "jdbc:postgresql://strenv(RDS_HOST):5432/shareddb"' -i $VALUES_FILE
+      - yq eval '.deployment.toml.database.user.url = "jdbc:postgresql://strenv(RDS_HOST):5432/userdb"' -i $VALUES_FILE
+      - yq eval '.deployment.toml.database.consent.url = "jdbc:postgresql://strenv(RDS_HOST):5432/consentdb"' -i $VALUES_FILE
+      - yq eval '.deployment.toml.database.identity.driver = "org.postgresql.Driver"' -i $VALUES_FILE
+      - yq eval '.deployment.toml.database.shared.driver = "org.postgresql.Driver"' -i $VALUES_FILE
+      - yq eval '.deployment.toml.database.user.driver = "org.postgresql.Driver"' -i $VALUES_FILE
+      - yq eval '.deployment.toml.database.consent.driver = "org.postgresql.Driver"' -i $VALUES_FILE
+      - yq eval '.deployment.toml.keystore.tls.fileName = "tls.jks"' -i $VALUES_FILE
+      - yq eval '.deployment.toml.keystore.primary.fileName = "primary.jks"' -i $VALUES_FILE
+      - yq eval '.deployment.toml.keystore.internal.fileName = "internal.jks"' -i $VALUES_FILE
+      - yq eval '.apparmor.enabled = false' -i $VALUES_FILE
+      - yq eval '.rbac.annotations."eks.amazonaws.com/role-arn" = strenv(IRSA_ROLE_ARN)' -i $VALUES_FILE
+      - yq eval '.fullnameOverride = strenv(RELEASE_NAME)' -i $VALUES_FILE
+      - yq eval '.pv-pvc.fullnameOverride = strenv(RELEASE_NAME)' -i $VALUES_FILE
+      - echo "Values have been updated in $VALUES_FILE"
 
 artifacts:
   files:
