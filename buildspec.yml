@@ -94,27 +94,32 @@ phases:
       - echo "Cloning the kubernetes-is repo..."
       - git clone --branch AWS-Helm https://github.com/loshan20011/kubernetes-is.git
       - yq eval '.deployment.ingress.hostName = strenv(CLOUD_FRONT_HOST)' -i $VALUES_FILE
-      - yq eval '.deployment.aws.enabled = true' -i $VALUES_FILE
+      - yq eval '.deployment.ingress.aws.enabled = true' -i $VALUES_FILE
       - yq eval '.deployment.externalJKS.enabled = true' -i $VALUES_FILE
-      - yq eval '.deployment.persistence.aws.volumeHandle = strenv(VOLUME_HANDLE)' -i $VALUES_FILE
+      - yq eval '.deployment.persistence.aws.enabled = true -i $VALUES_FILE'
+      - yq eval '.pv-pvc.deployment.persistence.aws.volumeHandle = strenv(VOLUME_HANDLE)' -i $VALUES_FILE
       - yq eval '.deployment.secretStore.aws.enabled = true' -i $VALUES_FILE
       - yq eval '.deployment.secretStore.aws.secretManager.region = strenv(CLUSTER_REGION)' -i $VALUES_FILE
       - yq eval '.deployment.image.registry = strenv(ECR_REGISTRY)' -i $VALUES_FILE
       - yq eval '.deployment.image.repository = strenv(ECR_IMAGE)' -i $VALUES_FILE
       - yq eval '.deployment.image.tag = strenv(ECR_TAG)' -i $VALUES_FILE
-      - yq eval '.deployment.toml.database.identity.url = "jdbc:postgresql://strenv(RDS_HOST):5432/identitydb"' -i $VALUES_FILE
-      - yq eval '.deployment.toml.database.shared.url = "jdbc:postgresql://strenv(RDS_HOST):5432/shareddb"' -i $VALUES_FILE
-      - yq eval '.deployment.toml.database.user.url = "jdbc:postgresql://strenv(RDS_HOST):5432/userdb"' -i $VALUES_FILE
-      - yq eval '.deployment.toml.database.consent.url = "jdbc:postgresql://strenv(RDS_HOST):5432/consentdb"' -i $VALUES_FILE
-      - yq eval '.deployment.toml.database.identity.driver = "org.postgresql.Driver"' -i $VALUES_FILE
-      - yq eval '.deployment.toml.database.shared.driver = "org.postgresql.Driver"' -i $VALUES_FILE
-      - yq eval '.deployment.toml.database.user.driver = "org.postgresql.Driver"' -i $VALUES_FILE
-      - yq eval '.deployment.toml.database.consent.driver = "org.postgresql.Driver"' -i $VALUES_FILE
-      - yq eval '.deployment.toml.keystore.tls.fileName = "tls.jks"' -i $VALUES_FILE
-      - yq eval '.deployment.toml.keystore.primary.fileName = "primary.jks"' -i $VALUES_FILE
-      - yq eval '.deployment.toml.keystore.internal.fileName = "internal.jks"' -i $VALUES_FILE
-      - yq eval '.apparmor.enabled = false' -i $VALUES_FILE
-      - yq eval '.rbac.annotations."eks.amazonaws.com/role-arn" = strenv(IRSA_ROLE_ARN)' -i $VALUES_FILE
+      - yq eval '.deploymentToml.database.identity.type = "postgre"' -i $VALUES_FILE
+      - yq eval '.deploymentToml.database.shared.type = "postgre"' -i $VALUES_FILE
+      - yq eval '.deploymentToml.database.user.type = "postgre"' -i $VALUES_FILE
+      - yq eval '.deploymentToml.database.consent.type = "postgre"' -i $VALUES_FILE
+      - yq eval '.deploymentToml.database.identity.url = "jdbc:postgresql://strenv(RDS_HOST):5432/identitydb"' -i $VALUES_FILE
+      - yq eval '.deploymentToml.database.shared.url = "jdbc:postgresql://strenv(RDS_HOST):5432/shareddb"' -i $VALUES_FILE
+      - yq eval '.deploymentToml.database.user.url = "jdbc:postgresql://strenv(RDS_HOST):5432/userdb"' -i $VALUES_FILE
+      - yq eval '.deploymentToml.database.consent.url = "jdbc:postgresql://strenv(RDS_HOST):5432/consentdb"' -i $VALUES_FILE
+      - yq eval '.deploymentToml.database.identity.driver = "org.postgresql.Driver"' -i $VALUES_FILE
+      - yq eval '.deploymentToml.database.shared.driver = "org.postgresql.Driver"' -i $VALUES_FILE
+      - yq eval '.deploymentToml.database.user.driver = "org.postgresql.Driver"' -i $VALUES_FILE
+      - yq eval '.deploymentToml.database.consent.driver = "org.postgresql.Driver"' -i $VALUES_FILE
+      - yq eval '.deploymentToml.keystore.tls.fileName = "tls.jks"' -i $VALUES_FILE
+      - yq eval '.deploymentToml.keystore.primary.fileName = "primary.jks"' -i $VALUES_FILE
+      - yq eval '.deploymentToml.keystore.internal.fileName = "internal.jks"' -i $VALUES_FILE
+      - yq eval '.deployment.apparmor.enabled = false' -i $VALUES_FILE
+      - yq eval '.deployment.rbac.annotations."eks.amazonaws.com/role-arn" = strenv(IRSA_ROLE_ARN)' -i $VALUES_FILE
       - yq eval '.fullnameOverride = strenv(RELEASE_NAME)' -i $VALUES_FILE
       - yq eval '.pv-pvc.fullnameOverride = strenv(RELEASE_NAME)' -i $VALUES_FILE
       - echo "Values have been updated in $VALUES_FILE"
