@@ -92,7 +92,7 @@ phases:
       - kubectl get pods -A
       - kubectl get services -A
       - echo "Cloning the kubernetes-is repo..."
-      - git clone --branch AWS-Helm https://github.com/loshan20011/kubernetes-is.git
+      - git clone --branch AWS-Helm https://github.com/loshan20011/kubernetes-is.git && cd kubernetes-is
       - yq eval '.deployment.ingress.hostName = strenv(CLOUD_FRONT_HOST)' -i $VALUES_FILE
       - yq eval '.deployment.aws.enabled = true' -i $VALUES_FILE
       - yq eval '.deployment.externalJKS.enabled = true' -i $VALUES_FILE
