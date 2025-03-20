@@ -118,6 +118,7 @@ phases:
       - yq eval '.fullnameOverride = strenv(RELEASE_NAME)' -i $VALUES_FILE
       - yq eval '.pv-pvc.fullnameOverride = strenv(RELEASE_NAME)' -i $VALUES_FILE
       - echo "Values have been updated in $VALUES_FILE"
+      - cat kubernetes-is/values.yaml
 
 artifacts:
   files:
