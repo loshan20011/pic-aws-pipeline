@@ -89,6 +89,8 @@ phases:
       - echo "Verifying deployed resources..."
       - kubectl get pods -A
       - kubectl get services -A
+      - echo "Cloning the kubernetes-is repo..."
+      - git clone --branch AWS-Helm https://github.com/loshan20011/kubernetes-is.git
 
 artifacts:
   files:

@@ -33,8 +33,6 @@ phases:
 
   build:
     commands:
-      - echo "Cloning the kubernetes-is repo..."
-      - git clone --branch AWS-Helm https://github.com/loshan20011/kubernetes-is.git
       - echo "Deploying Helm Chart..."
       - helm upgrade --install $RELEASE_NAME ./kubernetes-is -n wso2is
         --set deployment.ingress.hostName=$CLOUD_FRONT_HOST
