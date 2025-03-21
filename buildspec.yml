@@ -56,9 +56,9 @@ phases:
       #   fi
       # - kubectl annotate serviceaccount aws-load-balancer-controller eks.amazonaws.com/role-arn=$EKS_LB_ROLE_ARN -n kube-system --overwrite
       - yq eval '.metadata.annotations."eks.amazonaws.com/role-arn" = strenv(EKS_LB_ROLE_ARN)' -i LB-Controller/service-account.yaml
-      - cat LB-Controller/service-account.yaml
-      - helm repo add eks https://aws.github.io/eks-charts
-      - helm repo update
+      - git clone https://github.com/aws/eks-charts.git
+      # - helm repo add eks https://aws.github.io/eks-charts
+      # - helm repo update
       # - echo "Checking if Helm release aws-load-balancer-controller exists..."
       # - |
       #   if ! helm list -n kube-system | grep -q "aws-load-balancer-controller"; then
@@ -125,7 +125,7 @@ phases:
       - yq eval '.fullnameOverride = strenv(RELEASE_NAME)' -i $VALUES_FILE
       - yq eval '.pv-pvc.fullnameOverride = strenv(RELEASE_NAME)' -i $VALUES_FILE
       - echo "Values have been updated in $VALUES_FILE"
-      - cat kubernetes-is/values.yaml
+      - cat LB-Controller/service-account.yaml
 
 artifacts:
   files:
