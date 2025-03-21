@@ -36,25 +36,26 @@ phases:
   build:
     commands:
       - echo "Applying Kubernetes resources..."
-      - |
-        if ! kubectl get ns kube-system &>/dev/null; then
-          echo "Namespace kube-system does not exist. Creating..."
-          kubectl create ns kube-system
-        fi
-      - echo "Applying logging setup..."
-      - |
-        if ! kubectl get ns aws-observability &>/dev/null; then
-          kubectl apply -f aws-logging/cloudwatch-logging.yaml
-        fi
-      - echo "Checking if ServiceAccount aws-load-balancer-controller exists..."
-      - |
-        if ! kubectl get serviceaccount aws-load-balancer-controller -n kube-system &>/dev/null; then
-          echo "ServiceAccount not found, creating..."
-          kubectl create serviceaccount aws-load-balancer-controller -n kube-system
-        else
-          echo "ServiceAccount already exists, skipping creation."
-        fi
-      - kubectl annotate serviceaccount aws-load-balancer-controller eks.amazonaws.com/role-arn=$EKS_LB_ROLE_ARN -n kube-system --overwrite
+      # - |
+      #   if ! kubectl get ns kube-system &>/dev/null; then
+      #     echo "Namespace kube-system does not exist. Creating..."
+      #     kubectl create ns kube-system
+      #   fi
+      # - echo "Applying logging setup..."
+      # - |
+      #   if ! kubectl get ns aws-observability &>/dev/null; then
+      #     kubectl apply -f aws-logging/cloudwatch-logging.yaml
+      #   fi
+      # - echo "Checking if ServiceAccount aws-load-balancer-controller exists..."
+      # - |
+      #   if ! kubectl get serviceaccount aws-load-balancer-controller -n kube-system &>/dev/null; then
+      #     echo "ServiceAccount not found, creating..."
+      #     kubectl create serviceaccount aws-load-balancer-controller -n kube-system
+      #   else
+      #     echo "ServiceAccount already exists, skipping creation."
+      #   fi
+      # - kubectl annotate serviceaccount aws-load-balancer-controller eks.amazonaws.com/role-arn=$EKS_LB_ROLE_ARN -n kube-system --overwrite
+      - yq eval '.metadata.annotations."eks.amazonaws.com/role-arn" = strenv(EKS_LB_ROLE_ARN)' -i LB-Controller/service-account.yaml
       - helm repo add eks https://aws.github.io/eks-charts
       - helm repo update
       - echo "Checking if Helm release aws-load-balancer-controller exists..."
